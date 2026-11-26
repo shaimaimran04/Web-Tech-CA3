@@ -1,0 +1,711 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sunseed — Productivity Planner &amp; Virtual Garden</title>
+    <meta
+      name="description"
+      content="A cute pastel pixel-art productivity planner, daily journal, and virtual gardening game built with HTML, CSS, and vanilla JavaScript."
+    />
+    <meta property="og:title" content="Sunseed" />
+    <meta
+      property="og:description"
+      content="Plan your daily tasks, track healthy habits, earn seeds, and grow a cozy pixel-art flower garden."
+    />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="stylesheet" href="style.css" />
+    <script src="script.js" defer></script>
+  </head>
+  <body>
+    <section id="intro-screen" class="intro-screen" aria-labelledby="intro-title">
+      <div class="card intro-card">
+        <div class="intro-hero">
+          <div class="intro-art-frame" id="intro-hero-art" aria-hidden="true"></div>
+          <div class="intro-heading-wrap">
+            <h1 id="intro-title">Sunseed</h1>
+            <p class="intro-tagline">
+              A cozy pastel pixel-art productivity planner, daily journal, and virtual flower garden.
+            </p>
+          </div>
+        </div>
+
+        <div class="intro-loading-block">
+          <div class="intro-loading-header">
+            <span id="intro-loading-label" class="muted-text">Preparing your garden...</span>
+            <span id="intro-loading-percent" class="muted-text tabular-num">0%</span>
+          </div>
+          <div
+            class="progress-track"
+            role="progressbar"
+            aria-label="Preparing Sunseed"
+            aria-valuemin="0"
+            aria-valuemax="100"
+            aria-valuenow="0"
+            id="intro-progress-track"
+          >
+            <div class="progress-fill" id="intro-progress-fill" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <div class="intro-features-block">
+          <h2 class="intro-section-label">What You Can Do Inside</h2>
+          <div class="intro-feature-grid">
+            <article class="intro-feature-item pastel-pink">
+              <div class="intro-feature-icon" id="intro-icon-planner" aria-hidden="true"></div>
+              <div class="intro-feature-copy">
+                <h3>Plan &amp; Customize Tasks</h3>
+                <p>
+                  Organize tasks with categories, due dates, pastel colors, and custom emojis.
+                  Earn <strong>+5 seeds</strong> the first time you finish a task.
+                </p>
+              </div>
+            </article>
+
+            <article class="intro-feature-item pastel-sage">
+              <div class="intro-feature-icon" id="intro-icon-garden" aria-hidden="true"></div>
+              <div class="intro-feature-copy">
+                <h3>Grow 9 Flower Pots</h3>
+                <p>
+                  Buy daisies, tulips, sunflowers, pastel lilies, and cherry blossoms in the Seed
+                  Shop and water them to Full Bloom.
+                </p>
+              </div>
+            </article>
+
+            <article class="intro-feature-item pastel-lavender">
+              <div class="intro-feature-icon" id="intro-icon-habits" aria-hidden="true"></div>
+              <div class="intro-feature-copy">
+                <h3>Track Daily Habits</h3>
+                <p>
+                  Check off daily routines with pixel icons or custom emojis, and celebrate wins
+                  with flower petal confetti.
+                </p>
+              </div>
+            </article>
+
+            <article class="intro-feature-item pastel-cream">
+              <div class="intro-feature-icon" id="intro-icon-journal" aria-hidden="true"></div>
+              <div class="intro-feature-copy">
+                <h3>Write in Your Journal</h3>
+                <p>
+                  Save daily reflections, moods, and small wins with pastel entry cards—saved
+                  automatically in your browser.
+                </p>
+              </div>
+            </article>
+          </div>
+        </div>
+
+        <div class="intro-footer-cta">
+          <button type="button" class="btn btn-primary intro-enter-btn" id="enter-app-btn">
+            Enter Sunseed
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <div id="app-shell" class="app-shell" hidden>
+      <header class="site-header">
+      <div class="container header-inner">
+        <a href="#home" class="brand-link" data-nav="home">
+          <span class="brand-icon" id="brand-pixel-icon" aria-hidden="true"></span>
+          <span class="brand-text">Sunseed</span>
+        </a>
+
+        <nav class="main-nav" aria-label="Primary navigation">
+          <button type="button" class="nav-btn active" data-section="home" aria-current="page">
+            Home
+          </button>
+          <button type="button" class="nav-btn" data-section="planner">
+            Planner
+          </button>
+          <button type="button" class="nav-btn" data-section="garden">
+            Garden
+          </button>
+          <button type="button" class="nav-btn" data-section="habits">
+            Habits
+          </button>
+          <button type="button" class="nav-btn" data-section="journal">
+            Journal
+          </button>
+        </nav>
+
+        <button
+          type="button"
+          class="seed-counter-btn"
+          data-section-jump="garden"
+          title="Go to Garden to spend seeds"
+        >
+          <span class="seed-icon-slot" id="header-seed-icon" aria-hidden="true"></span>
+          <span class="seed-counter-label">Seeds:</span>
+          <strong class="tabular-num" id="header-seed-count">10</strong>
+        </button>
+      </div>
+    </header>
+
+    <div class="container toast-wrapper">
+      <div id="status-banner" class="status-banner" role="status" aria-live="polite" hidden></div>
+    </div>
+
+    <main class="container main-content">
+      <!-- SECTION 1: HOME -->
+      <section id="section-home" class="page-section active" aria-labelledby="home-heading">
+        <div class="card hero-card">
+          <div class="hero-main">
+            <div class="hero-text">
+              <p class="eyebrow-text" id="home-date">Loading date...</p>
+              <h1 id="home-heading">Today's Overview</h1>
+              <div class="theme-picker-row">
+                <span class="muted-text">Page Theme:</span>
+                <div id="page-theme-picker" class="swatch-group" role="group" aria-label="Customize page theme"></div>
+              </div>
+            </div>
+
+            <div class="hero-weather-box pastel-sky" id="weather-card" aria-live="polite">
+              <div class="weather-art-frame" id="weather-pixel-art" aria-hidden="true"></div>
+              <div class="weather-info">
+                <div class="weather-temp-row">
+                  <p class="weather-temp tabular-num" id="weather-temp-display">--°C</p>
+                  <button
+                    type="button"
+                    class="btn btn-small btn-outline weather-mini-btn"
+                    id="weather-unit-btn"
+                    aria-label="Switch temperature unit"
+                  >
+                    °F
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-small btn-outline weather-mini-btn"
+                    id="weather-refresh-btn"
+                    aria-label="Detect local weather"
+                    title="Detect local weather"
+                  >
+                    ↻
+                  </button>
+                </div>
+                <p class="weather-condition" id="weather-condition-display">Detecting...</p>
+                <p class="muted-text" id="weather-location-display">Local Weather</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="home-workspace-grid">
+          <article class="card calendar-card" id="calendar-card">
+            <div class="calendar-top-header">
+              <div>
+                <h2>Calendar &amp; Important Dates</h2>
+                <p class="muted-text">Click a date to view or add reminders</p>
+              </div>
+              <div class="inline-color-row">
+                <span class="muted-text">Color:</span>
+                <div id="calendar-color-picker" class="swatch-group" role="group" aria-label="Customize calendar card color"></div>
+              </div>
+            </div>
+
+            <div class="calendar-nav-row">
+              <button
+                type="button"
+                class="btn btn-small btn-outline cal-year-step-btn"
+                id="cal-prev-year-btn"
+                aria-label="Previous year"
+                title="Previous year"
+              >
+                &laquo;
+              </button>
+              <div class="calendar-selects">
+                <select id="cal-month-select" class="cal-nav-select" aria-label="Select month">
+                  <option value="0">January</option>
+                  <option value="1">February</option>
+                  <option value="2">March</option>
+                  <option value="3">April</option>
+                  <option value="4">May</option>
+                  <option value="5">June</option>
+                  <option value="6">July</option>
+                  <option value="7">August</option>
+                  <option value="8">September</option>
+                  <option value="9">October</option>
+                  <option value="10">November</option>
+                  <option value="11">December</option>
+                </select>
+                <select id="cal-year-select" class="cal-nav-select" aria-label="Select year"></select>
+              </div>
+              <button
+                type="button"
+                class="btn btn-small btn-outline cal-year-step-btn"
+                id="cal-next-year-btn"
+                aria-label="Next year"
+                title="Next year"
+              >
+                &raquo;
+              </button>
+            </div>
+
+            <div class="calendar-weekdays" aria-hidden="true">
+              <span>Sun</span>
+              <span>Mon</span>
+              <span>Tue</span>
+              <span>Wed</span>
+              <span>Thu</span>
+              <span>Fri</span>
+              <span>Sat</span>
+            </div>
+
+            <div id="calendar-days-grid" class="calendar-days-grid" role="grid" aria-label="Monthly calendar"></div>
+
+            <div class="calendar-reminders-section">
+              <div class="section-row-header">
+                <h3 class="calendar-sub-heading" id="selected-date-heading">Reminders</h3>
+                <div class="filter-group" role="group" aria-label="Reminder view mode">
+                  <button type="button" class="filter-btn active" data-reminder-view="selected">
+                    Selected Day
+                  </button>
+                  <button type="button" class="filter-btn" data-reminder-view="upcoming">
+                    All Upcoming
+                  </button>
+                </div>
+              </div>
+
+              <ul id="calendar-reminders-list" class="reminder-list"></ul>
+
+              <form id="reminder-form" class="reminder-form" novalidate>
+                <div class="form-field form-field-grow">
+                  <label for="reminder-title">Important Date / Reminder</label>
+                  <input
+                    type="text"
+                    id="reminder-title"
+                    maxlength="70"
+                    placeholder="e.g., WebTech Assignment Demo"
+                    required
+                  />
+                </div>
+
+                <div class="form-field form-field-compact">
+                  <label for="reminder-emoji">Emoji</label>
+                  <input
+                    type="text"
+                    id="reminder-emoji"
+                    class="input-emoji"
+                    maxlength="12"
+                    placeholder="📌"
+                  />
+                </div>
+
+                <div class="form-field">
+                  <label for="reminder-date">Date</label>
+                  <input type="date" id="reminder-date" required />
+                </div>
+
+                <div class="form-field">
+                  <label for="reminder-category">Type</label>
+                  <select id="reminder-category">
+                    <option value="Reminder">Reminder</option>
+                    <option value="Special Date">Special Date</option>
+                    <option value="Birthday">Birthday</option>
+                    <option value="Anniversary">Anniversary</option>
+                    <option value="Exam">Exam</option>
+                    <option value="Deadline">Deadline</option>
+                    <option value="Event">Event</option>
+                    <option value="Holiday">Holiday</option>
+                    <option value="Personal">Personal</option>
+                  </select>
+                </div>
+
+                <div class="form-field">
+                  <span class="field-label-text">Color</span>
+                  <div id="reminder-color-picker" class="swatch-group" role="group" aria-label="Choose reminder color"></div>
+                </div>
+
+                <div class="form-submit-wrap">
+                  <button type="submit" class="btn btn-small btn-primary">Add Date</button>
+                </div>
+              </form>
+              <p id="reminder-error" class="form-error" role="alert" hidden></p>
+            </div>
+          </article>
+
+          <div class="home-right-column">
+            <article class="card overview-card">
+              <div class="section-row-header">
+                <div>
+                  <h2>Up Next Today</h2>
+                  <p class="muted-text">Check off a task right here to earn +5 seeds</p>
+                </div>
+                <button type="button" class="btn btn-small btn-secondary" data-section-jump="planner">
+                  Manage in Planner
+                </button>
+              </div>
+              <ul class="overview-task-list" id="home-task-preview"></ul>
+            </article>
+
+            <div class="summary-grid">
+              <article class="card summary-card card-sage">
+                <div class="summary-card-top">
+                  <h2>Tasks</h2>
+                  <span class="mini-pixel-slot" id="home-task-art" aria-hidden="true"></span>
+                </div>
+                <p class="big-stat tabular-num" id="home-task-ratio">0 / 0 Done</p>
+                <div
+                  class="progress-track"
+                  role="progressbar"
+                  aria-label="Daily task completion"
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                  aria-valuenow="0"
+                  id="home-progress-track"
+                >
+                  <div class="progress-fill" id="home-progress-fill" style="width: 0%"></div>
+                </div>
+                <p class="muted-text tabular-num" id="home-progress-text">0% completed</p>
+                <button type="button" class="btn btn-small btn-outline summary-card-cta" data-section-jump="planner">
+                  Open Planner
+                </button>
+              </article>
+
+              <article class="card summary-card card-pink">
+                <div class="summary-card-top">
+                  <h2>Garden</h2>
+                  <span class="mini-pixel-slot" id="home-seed-art" aria-hidden="true"></span>
+                </div>
+                <p class="big-stat tabular-num" id="home-seeds">10 Seeds</p>
+                <div
+                  class="progress-track"
+                  role="progressbar"
+                  aria-label="Garden pots blooming"
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                  aria-valuenow="0"
+                  id="home-garden-progress-track"
+                >
+                  <div class="progress-fill progress-fill-pink" id="home-garden-progress-fill" style="width: 0%"></div>
+                </div>
+                <p class="muted-text tabular-num" id="home-garden-summary">
+                  0 / 9 blooming · 0 growing
+                </p>
+                <button type="button" class="btn btn-small btn-outline summary-card-cta" data-section-jump="garden">
+                  Open Garden
+                </button>
+              </article>
+
+              <article class="card summary-card card-lavender">
+                <div class="summary-card-top">
+                  <h2>Habits</h2>
+                  <span class="mini-pixel-slot" id="home-habit-art" aria-hidden="true"></span>
+                </div>
+                <p class="big-stat tabular-num" id="home-habit-ratio">0 / 4 Done</p>
+                <div
+                  class="progress-track"
+                  role="progressbar"
+                  aria-label="Daily habit completion"
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                  aria-valuenow="0"
+                  id="home-habit-progress-track"
+                >
+                  <div class="progress-fill progress-fill-lavender" id="home-habit-progress-fill" style="width: 0%"></div>
+                </div>
+                <p class="muted-text tabular-num" id="home-habit-progress-text">0% completed today</p>
+                <button type="button" class="btn btn-small btn-outline summary-card-cta" data-section-jump="habits">
+                  Open Habits
+                </button>
+              </article>
+
+              <article class="card summary-card card-cream">
+                <div class="summary-card-top">
+                  <h2>Journal</h2>
+                  <span class="mini-pixel-slot" id="home-journal-art" aria-hidden="true"></span>
+                </div>
+                <p class="big-stat tabular-num" id="home-journal-count">0 Entries</p>
+                <p class="muted-text" id="home-journal-latest">
+                  No reflections written yet today
+                </p>
+                <button type="button" class="btn btn-small btn-outline summary-card-cta" data-section-jump="journal">
+                  Open Journal
+                </button>
+              </article>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 2: PLANNER -->
+      <section id="section-planner" class="page-section" aria-label="Planner" hidden>
+
+        <article class="card">
+          <h2 class="card-heading">Add a New Task</h2>
+          <form id="task-form" class="task-form" novalidate>
+            <div class="form-field form-field-grow">
+              <label for="task-title">Task Title</label>
+              <input
+                type="text"
+                id="task-title"
+                name="title"
+                maxlength="80"
+                placeholder="e.g., Finish WebTech CSS notes"
+                required
+              />
+            </div>
+
+            <div class="form-field form-field-compact">
+              <label for="task-emoji">Emoji (Optional)</label>
+              <input
+                type="text"
+                id="task-emoji"
+                name="emoji"
+                class="input-emoji"
+                maxlength="12"
+                placeholder="🌸"
+              />
+            </div>
+
+            <div class="form-field">
+              <label for="task-category">Category</label>
+              <select id="task-category" name="category">
+                <option value="Study">Study</option>
+                <option value="Personal">Personal</option>
+                <option value="Chores">Chores</option>
+                <option value="Creative">Creative</option>
+                <option value="Health">Health</option>
+              </select>
+            </div>
+
+            <div class="form-field">
+              <label for="task-date">Due Date</label>
+              <input type="date" id="task-date" name="dueDate" required />
+            </div>
+
+            <div class="form-field">
+              <span class="field-label-text">Task Color</span>
+              <div id="task-color-picker" class="swatch-group" role="group" aria-label="Choose task color"></div>
+            </div>
+
+            <div class="form-submit-wrap">
+              <button type="submit" class="btn btn-primary">Add Task</button>
+            </div>
+          </form>
+          <p id="task-error" class="form-error" role="alert" hidden></p>
+        </article>
+
+        <article class="card">
+          <div class="section-row-header">
+            <div class="filter-group" role="group" aria-label="Filter tasks by status">
+              <button type="button" class="filter-btn active" data-task-filter="all">All</button>
+              <button type="button" class="filter-btn" data-task-filter="pending">Pending</button>
+              <button type="button" class="filter-btn" data-task-filter="completed">Completed</button>
+            </div>
+            <p class="muted-text tabular-num" id="planner-count-label">0 tasks shown</p>
+          </div>
+
+          <ul id="task-list" class="task-list"></ul>
+        </article>
+      </section>
+
+      <!-- SECTION 3: GARDEN -->
+      <section id="section-garden" class="page-section" aria-label="Garden" hidden>
+
+        <article class="card">
+          <div class="section-row-header">
+            <div>
+              <h2 class="card-heading">Seed Shop</h2>
+              <p class="muted-text" id="selected-seed-notice">
+                Select a flower packet below, then click an empty pot to plant it.
+              </p>
+            </div>
+            <p class="muted-text tabular-num" id="garden-bloom-count">0 / 9 Pots Blooming</p>
+          </div>
+
+          <div id="seed-shop-grid" class="seed-shop-grid"></div>
+        </article>
+
+        <article class="card">
+          <h2 class="card-heading">Your Flower Pots</h2>
+          <div id="garden-pots-grid" class="garden-pots-grid"></div>
+        </article>
+      </section>
+
+      <!-- SECTION 4: HABITS -->
+      <section id="section-habits" class="page-section" aria-label="Habits" hidden>
+
+        <article class="card">
+          <div class="section-row-header">
+            <div class="habit-progress-info">
+              <h2 class="card-heading">Today's Progress</h2>
+              <p class="muted-text tabular-num" id="habits-progress-text">
+                0% completed today
+              </p>
+            </div>
+            <button type="button" class="btn btn-small btn-outline" id="reset-today-habits-btn">
+              Reset Today
+            </button>
+          </div>
+          <div
+            class="progress-track progress-track-lg"
+            role="progressbar"
+            aria-label="Daily habits completion"
+            aria-valuemin="0"
+            aria-valuemax="100"
+            aria-valuenow="0"
+            id="habits-progress-track"
+          >
+            <div class="progress-fill progress-fill-pink" id="habits-progress-fill" style="width: 0%"></div>
+          </div>
+        </article>
+
+        <article class="card">
+          <h2 class="card-heading">Add a Habit</h2>
+          <form id="habit-form" class="habit-form" novalidate>
+            <div class="form-field form-field-grow">
+              <label for="habit-input">Habit Name</label>
+              <input
+                type="text"
+                id="habit-input"
+                maxlength="50"
+                placeholder="e.g., Practice coding for 20 mins"
+                required
+              />
+            </div>
+
+            <div class="form-field">
+              <label for="habit-icon-select">Icon</label>
+              <select id="habit-icon-select" name="icon">
+                <option value="star">Sparkle Star</option>
+                <option value="study">Open Book</option>
+                <option value="water">Water Drop</option>
+                <option value="read">Book Stack</option>
+                <option value="exercise">Pixel Heart</option>
+                <option value="flower">Flower</option>
+                <option value="custom">Custom Emoji</option>
+              </select>
+            </div>
+
+            <div class="form-field form-field-compact" id="habit-emoji-field" hidden>
+              <label for="habit-emoji-input">Custom Emoji</label>
+              <input
+                type="text"
+                id="habit-emoji-input"
+                name="customEmoji"
+                class="input-emoji"
+                maxlength="12"
+                placeholder="🧘"
+              />
+            </div>
+
+            <div class="form-field">
+              <span class="field-label-text">Habit Color</span>
+              <div id="habit-color-picker" class="swatch-group" role="group" aria-label="Choose habit color"></div>
+            </div>
+
+            <div class="form-submit-wrap">
+              <button type="submit" class="btn btn-primary">Add Habit</button>
+            </div>
+          </form>
+          <p id="habit-error" class="form-error" role="alert" hidden></p>
+        </article>
+
+        <div id="habits-grid" class="habits-grid"></div>
+      </section>
+
+      <!-- SECTION 5: JOURNAL -->
+      <section id="section-journal" class="page-section" aria-label="Journal" hidden>
+
+        <article class="card">
+          <h2 class="card-heading">Write a Journal Entry</h2>
+          <form id="journal-form" class="journal-form" novalidate>
+            <div class="journal-form-row">
+              <div class="form-field form-field-grow">
+                <label for="journal-title">Title (Optional)</label>
+                <input
+                  type="text"
+                  id="journal-title"
+                  name="title"
+                  maxlength="80"
+                  placeholder="e.g., Sunny afternoon study session"
+                />
+              </div>
+
+              <div class="form-field">
+                <label for="journal-date">Date</label>
+                <input type="date" id="journal-date" name="date" required />
+              </div>
+
+              <div class="form-field">
+                <label for="journal-mood-select">Mood</label>
+                <select id="journal-mood-select" name="mood">
+                  <option value="☀️ Sunny">☀️ Sunny</option>
+                  <option value="🌸 Happy">🌸 Happy</option>
+                  <option value="🌿 Calm">🌿 Calm</option>
+                  <option value="✨ Focused">✨ Focused</option>
+                  <option value="🍵 Cozy">🍵 Cozy</option>
+                  <option value="🌙 Tired">🌙 Tired</option>
+                  <option value="custom">Custom Emoji</option>
+                </select>
+              </div>
+
+              <div class="form-field form-field-compact" id="journal-emoji-field" hidden>
+                <label for="journal-emoji-input">Mood Emoji</label>
+                <input
+                  type="text"
+                  id="journal-emoji-input"
+                  name="customEmoji"
+                  class="input-emoji"
+                  maxlength="12"
+                  placeholder="🌻"
+                />
+              </div>
+
+              <div class="form-field">
+                <span class="field-label-text">Card Color</span>
+                <div id="journal-color-picker" class="swatch-group" role="group" aria-label="Choose journal card color"></div>
+              </div>
+            </div>
+
+            <div class="form-field journal-body-field">
+              <label for="journal-body">Journal Note</label>
+              <textarea
+                id="journal-body"
+                name="body"
+                rows="4"
+                maxlength="1200"
+                placeholder="Write what happened today, how you feel, or one thing you're proud of..."
+                required
+              ></textarea>
+            </div>
+
+            <div class="journal-form-actions">
+              <button type="submit" class="btn btn-primary">Save Entry</button>
+            </div>
+          </form>
+          <p id="journal-error" class="form-error" role="alert" hidden></p>
+        </article>
+
+        <article class="card">
+          <div class="section-row-header">
+            <h2 class="card-heading">Your Entries</h2>
+            <p class="muted-text tabular-num" id="journal-count-label">0 entries saved</p>
+          </div>
+          <div id="journal-list" class="journal-list"></div>
+        </article>
+      </section>
+    </main>
+
+      <footer class="site-footer">
+        <div class="container footer-inner">
+          <p class="muted-text">Sunseed</p>
+          <div class="footer-actions">
+            <button type="button" class="btn-text" id="show-intro-btn">
+              Welcome Guide
+            </button>
+            <button type="button" class="btn-text" id="reset-demo-btn">
+              Reset Demo Data
+            </button>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <div id="petal-confetti-layer" class="petal-confetti-layer" aria-hidden="true"></div>
+  </body>
+</html>

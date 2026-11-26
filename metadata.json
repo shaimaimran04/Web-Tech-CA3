@@ -1,0 +1,6 @@
+{
+  "name": "Bloom & Beyond",
+  "description": "A cute pastel pixel-art productivity planner and virtual gardening game built with HTML, CSS, and vanilla JavaScript.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
